@@ -2,3 +2,7 @@ Este diretório contém arquivos que correspondem aos exemplos do diretório
 gubi/ com os identificadores traduzidos para o português.
 
 Alem de traduzidos, estes exemplos têm mais comentários e testes.
+
+Os arquivos são:
+
+01-ea.scm - Aula 1, Expressões Aritméticas
