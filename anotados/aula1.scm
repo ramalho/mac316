@@ -6,63 +6,67 @@
 ;;; para facilitar a leitura do código, os identificadores definidos
 ;;; na linguagem abstrata usam o prefixo %
 
-(define-type AE		; define-type é do PLAI-Scheme (selecione e tecle F1)
-  [%num (n number?)]	; construtor 'num' e recebe um número
-  [%add (lhs AE?)	; construtor 'add' recebe 2 AEs, lhs (left) e rhs (right)
-       (rhs AE?)]
-  [%sub (lhs AE?)	; similar.
-       (rhs AE?)])
+; PLAI section 1.2, p. 6
+(define-type AE	     ; define-type é do PLAI-Scheme (selecione e tecle F1)
+  [%num (n number?)] ; construtor '%num' e recebe um número
+  [%add (lhs AE?)    ; construtor '%add' recebe 2 AEs: lhs (left), rhs (right)
+        (rhs AE?)]
+  [%sub (lhs AE?)    ; similar.
+        (rhs AE?)])
 
 ;;; Parser em Scheme
+
+; PLAI section 1.3, p.8
 (define (parse sexp)
   (cond
-   [(number? sexp) (%num sexp)]	        ; se for um número, apenas use o construtor
-   [(cons? sexp)			; se for um cons (lista)
-    
-    (case (first sexp)			; examina o primeiro elemento da lista
-      [(+)  		                ; este + é da nossa sintaxe concreta
-	   (%add (parse (second sexp))  ; construtor e chamada recursiva
-                (parse (third sexp)))			
-      ]
+   [(number? sexp) (%num sexp)]	      ; sexp é número, apenas use o construtor
+   [(list? sexp)		      ; se sexp é lista...    
+     (case (first sexp)		      ; ...examinar o primeiro item da lista
+       [(+)  		              ; este + é da nossa sintaxe concreta
+	   (%add (parse (second sexp)); construtor e chamada recursiva
+                 (parse (third sexp)))			
+       ]
 		  
-      [(-) 				; subtração
-  	   (%sub (parse (second sexp))
-                (parse (third sexp)))
+       [(-) 				; subtração
+   	   (%sub (parse (second sexp))
+                 (parse (third sexp)))
       ]
      )
     ]
    )
   )
-;;; End
+
+;; Avaliador (interpretador de AE)
+;; calc : AE -> number
+;; consome uma AE e computa o número correspondente
+
+; PLAI chapter 2, p. 13
+(define (calc an-ae)
+  (type-case AE an-ae
+             [%num (n) n] 	                ; se for num, devolve o valor
+             [%add (l r) (+ (calc l) (calc r))] ; somar usando + do Scheme
+             [%sub (l r) (- (calc l) (calc r))] ; similar
+))
 
 
-;; Avaliador
- (define (calc an-ae)
-         (type-case AE an-ae
-                [%num (n) n] 	; se for num, retorna o valor
-                [%add (l r) (+ (calc l) (calc r))] ; add -> faz a soma
-                [%sub (l r) (- (calc l) (calc r))] ; similar
-  ))
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; TESTES
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; TESTES
  
 ; durante o desenvolvimento é melhor omitir os resultados "good", porque
 ; quando há muitos testes podemos não ver os "bad" no meio dos "good"
  
 (print-only-errors #t)
- 
+
 ;;; Testes para entender o define-type
 
 ; o define-type cria um predicado para testar expressões completas
 
-(test (AE? (%num 3)) #t)
+(test (AE? (%num 3)) #t) ; %num é o construtor de números
 (test/pred (%num 3) AE?) ; outra forma de escrever o teste acima, com menos ()
-(test/pred (%add (%num 3) (%num 4)) AE?)
+(test/pred (%add (%num 3) (%num 4)) AE?) ; %add é o construtor de adições
 
 ; define-type também cria predicados para testar as variantes
 
-(test/pred (%num 3) %num?)
+(test/pred (%num 3) %num?) ; %num? testa se uma expressão é %num
 (test/pred (%sub (%num 7) (%num 4)) %sub?)
 (test/pred (%add (%num 5) (%sub (%num 7) (%num 4))) %add?)
 
@@ -74,13 +78,12 @@
 
 ;;; Testes do parser
 
-(define NINE_ABS (%num 9))
-(define ADD_ABS (%add (%num 3) (%num 4)))
-(define SUB_ABS (%sub (%num 3) (%add (%num 5) (%num 2))))
-
-(test (parse '9) NINE_ABS)
-(test (parse '{+ 3 4}) ADD_ABS)
-(test (parse '{- 3 {+ 5 2}}) SUB_ABS)
+(test (parse '9) 
+      (%num 9))
+(test (parse '{+ 3 4}) 
+      (%add (%num 3) (%num 4)))
+(test (parse '{- 3 {+ 5 2}}) 
+      (%sub (%num 3) (%add (%num 5) (%num 2))))
 
 (test/pred (parse '3) AE?)
 (test (%add? (parse '3)) #f) ; '3 não é uma adição
@@ -88,16 +91,22 @@
 (test/pred (parse '{+ 3 4}) %add?) ; isto é uma adição
 
 ; este parser devolve #<void> quando a sintaxe é inválida 
-(test/pred (parse '{add 3 4}) void?) ; add não é parte da sintaxe concreta!
-(test/pred (parse '{%add 3 4}) void?) ; %add também não é da sintaxe concreta!
-(test (%add? (parse '{+ 3 4})) #t)
-(test (%add-lhs (parse '{+ 3 4})) (%num 3)) ; acesso a um campo do tipo 
+(test/pred (parse '{add 3 4}) void?) ; add não é parte da sintaxe concreta
+(test/pred (parse '{%add 3 4}) void?) ; %add também não é da sintaxe concreta
+(test/pred (parse '{+ 3 4}) AE?) ; esta é a nossa sintaxe concreta
+(test (%add-lhs (parse '{+ 3 4})) (%num 3)) ; acessar campo lhs da variante add
 
-; (test (numero? (parse '3)) #t)
+;;; Testes do interpretador
 
-;;; contagem de falhas e testes
+; PLAI chapter 2, p. 13
+(test (calc (parse '3)) 3)
+(test (calc (parse '{+ 3 4})) 7)
+(test (calc (parse '{+ {- 3 4} 7})) 6)
+
+; exibir contagem de falhas e testes
 (display 
   (list 
-    (length (filter (lambda (l) (eq? 'bad (car l))) plai-all-test-results)) "falhas em"
+    (length (filter (lambda (l) (eq? 'bad (car l))) plai-all-test-results)) 
+    "falhas em"
     (length plai-all-test-results) "testes")) 
 
