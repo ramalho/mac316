@@ -121,10 +121,11 @@
 (test (calc (parse '{+ 3 4})) 7)
 (test (calc (parse '{+ {- 3 4} 7})) 6)
 
-; exibir contagem de falhas e testes
-(display 
-  (list 
-    (length (filter (lambda (l) (eq? 'bad (car l))) plai-all-test-results)) 
-    "falhas em"
-    (length plai-all-test-results) "testes")) 
+; exibir contagem de falhas, exceções e testes
+(define (contar-testes simbolo) 
+  (length (filter (lambda (teste) (eq? simbolo (car teste))) 
+                  plai-all-test-results)))
 
+(display (list (contar-testes 'bad) "falhas," 
+               (contar-testes 'exception) "excecoes em"
+               (length plai-all-test-results) "testes"))

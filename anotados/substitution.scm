@@ -40,8 +40,7 @@
   )
 )
 
-
-;; parse : sexp $\longrightarrow$ WAE
+;; parse : sexp -> WAE
 ;; to convert s-expressions into WAEs
 
 (define (parse sexp)
@@ -62,7 +61,6 @@
    )
   )
 
-
 ;; calc : WAE!number
 ;; evaluates WAE expressions by reducing them to numbers
 (define (calc expr)
@@ -75,8 +73,8 @@
                                 bound-id
                                 (%num (calc named-expr))))]
              [%id (v) (error 'calc "free identifier")]
-             )
-  )
+ )
+)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; TESTES
@@ -120,9 +118,47 @@
                  (else (error "erro de sintaxe")))
       (%num 3)) ; 'a é o valor do campo field2 de %with
 
-; exibir contagem de falhas e testes
-(display 
-  (list 
-    (length (filter (lambda (l) (eq? 'bad (car l))) plai-all-test-results)) 
-    "falhas em"
-    (length plai-all-test-results) "testes")) 
+;;; Testes de subst
+
+(test (subst (%add (%num 5) (%id 'b)) 'b (%num 7))
+      (%add (%num 5) (%num 7)))
+
+(test (subst (%add (%num 5) (%id 'c)) 'c (%sub (%num 7) (%num 3)))
+      (%add (%num 5) (%sub (%num 7) (%num 3))))
+
+;;; Testes de calc
+
+(test (calc WITH_A) 3)
+(test (calc (%with 'x (%num 3) (%add (%num 17) (%id 'x)))) 20)
+(test (calc (%with 'z (%add (%num 12) (%num 13)) (%add (%num 17) (%id 'z)))) 42)
+
+;;; Testes de parse
+
+(test (parse '{with {x {+ 5 5}} {+ x x}}) 
+      (%with 'x (%add (%num 5) (%num 5)) (%add (%id 'x) (%id 'x))))
+
+
+;;; Testes de parse e calc
+
+; PLAI section 3.3, p. 21
+(test (calc (parse '5)) 5)
+(test (calc (parse '{+ 5 5})) 10)
+(test (calc (parse '{with {x {+ 5 5}} {+ x x}} ) ) 20)
+(test (calc (parse '{with {x 5} {+ x x}})) 10)
+;(test (calc (parse '{with {x {+ 5 5}} {with {y {- x 3}} {+ y y}}})) 14)
+;(test (calc (parse '{with {x 5} {with {y {- x 3}} {+ y y}}})) 4)
+(test (calc (parse '{with {x 5} {+ x {with {x 3} 10}}})) 15)
+(test (calc (parse '{with {x 5} {+ x {with {x 3} x}}})) 8)
+(test (calc (parse '{with {x 5} {+ x {with {y 3} x}}})) 10)
+;(test (calc (parse '{with {x 5} {with {y x} y}})) 5)
+;(test (calc (parse '{with {x 5} {with {x x} x}})) 5)
+
+
+; exibir contagem de falhas, exceções e testes
+(define (contar-testes simbolo) 
+  (length (filter (lambda (teste) (eq? simbolo (car teste))) 
+                  plai-all-test-results)))
+
+(display (list (contar-testes 'bad) "falhas," 
+               (contar-testes 'exception) "excecoes em"
+               (length plai-all-test-results) "testes"))
