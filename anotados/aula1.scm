@@ -96,6 +96,24 @@
 (test/pred (parse '{+ 3 4}) AE?) ; esta é a nossa sintaxe concreta
 (test (%add-lhs (parse '{+ 3 4})) (%num 3)) ; acessar campo lhs da variante add
 
+;;; Testes para entender o type-case
+
+(test (type-case AE (%num 3)
+                 (%num (x) x)
+                 (else (error "erro de sintaxe")))
+      3) ; nesta AE, 3 é o valor do campo x de %num
+
+(test (type-case AE (%add (%num 3) (%num 4))
+                 (%num (x) x)
+                 (%add (l r) r)
+                 (else (error "erro de sintaxe")))
+      (%num 4)) ; (%num 4) é o valor do campo r de %add
+
+(test/exn (type-case AE (%add (%num 3) (%num 4))
+                     (%num (x) x)
+                     (else (error "erro de sintaxe")))
+          "erro de sintaxe") ; neste type-case a variante %add não existe 
+
 ;;; Testes do interpretador
 
 ; PLAI chapter 2, p. 13
