@@ -13,6 +13,13 @@
   [%id (name symbol?)]
 )
 
+;;; No capítulo 3 de PLAI há três versões para a função de substituição,
+;;; aqui denominadas subst-v1, subst-v2 e subst-v3. A função é usada 
+;;; apenas no interpretador (calc) e em diretamente em alguns testes. 
+;;; Logo antes da definição de calc coloquei uma definição que associa 
+;;; subst a subst-v1, subst-v2 ou subst-v3, para facilitar os testes com 
+;;; as três versões.
+
 ;; subst : WAE symbol WAE -> WAE
 ;; substitutes second argument with third argument in first argument,
 ;; as per the rules of substitution; the resulting expression contains
@@ -21,16 +28,9 @@
 ; substitui sub-id por val em expr; a expressão resultante não tem
 ; instâncias livres de sub-id
 
-; No capítulo 3 de PLAI há três versões para a função de substituição,
-; aqui denominadas subst-v1, subst-v2 e subst-v3. A função é usada 
-; apenas no interpretador (calc) e em diretamente em alguns testes. 
-; Logo antes da definição de calc coloquei uma definição que associa 
-; subst a sobst-v1, subst-v2 ou subst-v3, para facilitar os testes com 
-; as três versões.
-
 ; PLAI section 3.1, p. 19-20
 ; subst renomeado para subst-v1
-; esta implementação gera exceção nos testes t5, t6, t10 e t11 abaixo
+; esta implementação gera exceção nos testes t5, t6, t10 e t11 lá embaixo
 (define (subst-v1 expr sub-id val)
   (type-case WAE expr
              [%num (n) expr]
@@ -220,6 +220,12 @@
 (test (calc (parse '{with {x 5} {with {y x} y}})) 5) ; t10
 ; t11: excecao "free identifier" com subst-v1 e subst-v2
 (test (calc (parse '{with {x 5} {with {x x} x}})) 5) ; t11
+
+; testes da exceção de "free identifier"
+
+(test/exn (calc (parse 'x)) "free identifier") 
+(test/exn (calc (parse '{+ x 4})) "free identifier")
+(test/exn (calc (parse '{with {x 2} {+ x y}})) "free identifier")
 
 ; exibir contagem de falhas, exceções e testes
 (define (contar-testes simbolo) 
