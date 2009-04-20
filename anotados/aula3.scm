@@ -19,6 +19,7 @@
            (body F1WAE?)])	; o que acontece se usarmos WAE aqui???
 
 ; expressão aceita pela linguagem
+; PLAI section 4.1, p. 28
 (define-type F1WAE
   [%num (n number?)]
   [%add (lhs F1WAE?)
@@ -34,6 +35,7 @@
 
 
 ; interp : F1WAE list-of-FunDef -> num
+; PLAI section 4.1, p. 28-29
 (define (interp a-wae defs)
   (type-case F1WAE a-wae
     [%num (n) n]
@@ -42,7 +44,8 @@
     [%with (bound-id named-expr body-expr)
       (interp (subst body-expr
                      bound-id
-                     (interp named-expr defs))
+                     (interp named-expr defs)) ;LR| diferente em PLAI!!!
+                     ;(%num (interp named-expr defs))) ;LR| é assim no PLAI
               defs)]
     [%id (name) (error 'interp "free variable")] ; por que o aviso de erro???
     [%app (fname arg-expr)
@@ -50,8 +53,9 @@
             (interp (subst 
                      ($fundef-body f)          ; corpo de f
                      ($fundef-arg-name f)      ; argumento formal de f
-                     (interp arg-expr defs)   ; valor do argumento
-                    )
+                     ;LR| diferente em PLAI!!!
+                     (interp arg-expr defs))   ; valor do argumento
+                     ; (%num (interp arg-expr defs))) ;LR| é assim no PLAI
                     defs))]
     )
   )
