@@ -44,8 +44,8 @@
     [%with (bound-id named-expr body-expr)
       (interp (subst body-expr
                      bound-id
-                     ;(interp named-expr defs)) ;LR| diferente em PLAI
-                     (%num (interp named-expr defs))) ; LR| errado como no PLAI
+                     ;(%num (interp named-expr defs))) ; LR| errado como no PLAI
+                     (interp named-expr defs)) ;LR| corrigido
               defs)]
     [%id (name) (error 'interp "free variable")] ; por que o aviso de erro???
     [%app (fname arg-expr)

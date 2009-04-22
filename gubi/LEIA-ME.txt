@@ -6,6 +6,7 @@ aula1.scm       AE - primeira linguagem
 aula3.scm       F1WAE (com perguntas)
 aula3a.scm      F1WAE com substituição postergada
 aula4.scm       FWAE com substituição imediata
+aula4a.scm      FAE com substituição postergada
 aula5.scm       FAE com substituição postergada e fechamento
 aula6.scm       CFAE/L
 aula6a.scm      CFAE/L com cache

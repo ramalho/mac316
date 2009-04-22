@@ -1,8 +1,24 @@
 Este diretório contém arquivos que correspondem aos exemplos do diretório 
-gubi/ com os identificadores traduzidos para o português.
+gubi/ com vários identificadores modificados e traduzidos para tornar mais
+fácil distinguir nossos identificadores daqueles nativos do Scheme e do 
+PLAI-Scheme.
 
-Alem de traduzidos, estes exemplos têm mais comentários e testes.
+Além disso, estes exemplos têm mais comentários e testes.
 
-Os arquivos são:
+Os arquivos originais foram publicados pelo Prof. Gubi no Paca [1]
+e se encontram no diretório ../gubi/ neste repositório.
 
-01-ea.scm - Aula 1, Expressões Aritméticas
+[1] http://paca.ime.usp.br/course/category.php?id=26
+
+aula1.scm       AE - primeira linguagem
+aula3.scm       F1WAE (com perguntas)
+aula3a.scm      F1WAE com substituição postergada
+aula4.scm       FWAE com substituição imediata
+aula4a.scm      FAE com substituição postergada
+aula5.scm       FAE com substituição postergada e fechamento
+aula6.scm       CFAE/L
+aula6a.scm      CFAE/L com cache
+aula7.scm       Recursão
+Parse-FAE.scm   Parser FAE
+Parse-RFCAE.scm Parser com recursão
+
