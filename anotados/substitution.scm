@@ -136,7 +136,7 @@
                    (calc (subst bound-body
                                 bound-id
                                 (%num (calc named-expr))))]
-             [%id (v) (error 'calc "free identifier")]
+             [%id (v) (error 'calc "free identifier: ~s" v)]
  )
 )
 

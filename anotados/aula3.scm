@@ -34,7 +34,7 @@
         (arg-expr F1WAE?)])	; melhor F1WAE ou WAE???
 
 
-; interp : F1WAE list-of-FunDef -> num
+; interp : F1WAE list-of-FunDef -> number
 ; PLAI section 4.1, p. 28-29
 (define (interp a-wae defs)
   (type-case F1WAE a-wae
@@ -44,8 +44,8 @@
     [%with (bound-id named-expr body-expr)
       (interp (subst body-expr
                      bound-id
-                     (interp named-expr defs)) ;LR| diferente em PLAI!!!
-                     ;(%num (interp named-expr defs))) ;LR| é assim no PLAI
+                     ;(interp named-expr defs)) ;LR| diferente em PLAI
+                     (%num (interp named-expr defs))) ; LR| errado como no PLAI
               defs)]
     [%id (name) (error 'interp "free variable")] ; por que o aviso de erro???
     [%app (fname arg-expr)
@@ -53,12 +53,24 @@
             (interp (subst 
                      ($fundef-body f)          ; corpo de f
                      ($fundef-arg-name f)      ; argumento formal de f
-                     ;LR| diferente em PLAI!!!
+                     ;LR| linha abaixo diferente em PLAI
                      (interp arg-expr defs))   ; valor do argumento
-                     ; (%num (interp arg-expr defs))) ;LR| é assim no PLAI
                     defs))]
     )
   )
+
+
+;LR| As linhas marcadas como "diferente em PLAI" estão erradas no livro.
+;LR| No primeiro caso, a linha no livro é:
+;LR|      (%num (interp named-expr defs)))
+;LR| Isso faz com que o interp devolva a representação de número (%num) da 
+;LR| nossa linguagem, mas o contrato diz F1WAE list-of-FunDef -> number
+;LR| ou seja, o interp tem que devolver números de Scheme. 
+;LR| Note que as variantes %add e %sub tratam o resultado da chamada recursiva 
+;LR| de interp como número, usando os operadores + e - de Scheme. 
+;LR| E a variante %num devolve o valor do campo n de %num, que é um número
+;LR| (veja definição de F1WAE).
+;LR| A outra linha diferente tem o mesmo erro no livro: constrói um %num.
 
 ; find-def : sym list-of-FunDef -> FunDef
 (define (find-def fname l)
@@ -69,26 +81,6 @@
               (find-def fname (rest l)))]))
 
 ; É verdade que find-def faz uma busca de complexidade exponencial???
-
-;LR| durante o desenvolvimento é melhor omitir os resultados "good", porque
-;LR| quando há muitos testes podemos não ver os "bad" no meio dos "good"
- 
-(print-only-errors #t)
-
-;LR| O teste comentado abaixo está no código do Prof. Gubi, mas resulta 'bad
-;LR| porque no corpo do lambda o find-def não é invocado (só seria se a função
-;LR| definida no lambda fosse invocada), então a exceção esperada não ocorre
-
-;(test/exn (lambda () (find-def 'x empty)) "no such function")
-
-;LR| creio que esta é intenção do teste acima:
-(test/exn (find-def 'x empty) "no such function")
-
-
-(test (find-def 'f (list
-                    ($fundef 'g 'y (%num 12))
-                    ($fundef 'f 'y (%num 10))))
-      ($fundef 'f 'y (%num 10)))
 
 ; subst : F1WAE sym num -> F1WAE
 (define (subst a-wae sub-id val)
@@ -111,77 +103,7 @@
     [%app (fname arg-expr)
          (%app fname (subst arg-expr sub-id val))])) ; o que faz este subst???
 
-(test (subst (%add (%num 1) (%id 'x)) 'x 10)
-      (%add (%num 1) (%num 10)))
-(test (subst (%id 'x) 'x 10)
-      (%num 10))
-(test (subst (%id 'y) 'x 10)
-      (%id 'y))
-(test (subst (%sub (%id 'x) (%num 1)) 'y 10)
-      (%sub (%id 'x) (%num 1)))
-(test (subst (%app 'x (%num 10)) 'y 12)
-      (%app 'x (%num 10)))
-(test (subst (%app 'x (%id 'y)) 'y 12)
-      (%app 'x (%num 12)))
-(test (subst (%app 'y (%num 10)) 'y 12)
-      (%app 'y (%num 10)))
 
+;LR| movi os testes para o arquivo aula3-tests.scm
 
-(test (subst (%with 'y (%num 17) (%id 'x)) 'x 10)
-      (%with 'y (%num 17) (%num 10)))
-(test (subst (%with 'y (%id 'x) (%id 'y)) 'x 10)
-      (%with 'y (%num 10) (%id 'y)))
-(test (subst (%with 'x (%id 'y) (%id 'x)) 'x 10)
-      (%with 'x (%id 'y) (%id 'x)))
-
-(test (interp (%num  5) empty)
-      5)
-(test (interp (%add (%num  1) (%num  2)) empty)
-      3)
-(test (interp (%sub (%num  1) (%num  2)) empty)
-      -1)
-(test (interp (%with 'x (%add (%num  1) (%num  17))
-                (%add (%id 'x) (%num  12)))
-              empty)
-      30)
-
-;LR| Aqui o Prof. Gubi colocou a chamada ao interp dentro de um lambda, e o
-;LR| resultado é que este teste resulta 'bad porque a exceção não ocorre
-;(test/exn (lambda ()
-;            (interp (%id 'x) empty))
-;          "free variable")
-
-;LR| este teste exercita a exceção
-(test/exn (interp (%id 'x) empty)
-          "free variable")
-
-;LR| Novamente a questão do lambda...
-;(test/exn (lambda ()
-;            (interp (%app  'f (%num  10)) empty))
-;          "no such function")
-
-;LR| este teste exercita a exceção
-(test/exn (interp (%app  'f (%num  10)) empty)
-          "no such function")
-
-(test (interp (%app  'f (%num  10))
-              (list ($fundef 'f
-                            'y
-                            (%add (%id 'y) (%num  1)))))
-      11)
-(test (interp (%app  'f (%num  10))
-              (list
-               ($fundef 'f
-                       'y
-                       (%with 'y (%num  7)
-                             (%id 'y)))))
-      7)
-
-; exibir contagem de falhas, exceções e testes
-(define (contar-testes simbolo) 
-  (length (filter (lambda (teste) (eq? simbolo (car teste))) 
-                  plai-all-test-results)))
-
-(display (list (contar-testes 'bad) "falhas," 
-               (contar-testes 'exception) "excecoes em"
-               (length plai-all-test-results) "testes"))
+(include "aula3-tests.scm")
