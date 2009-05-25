@@ -2,6 +2,8 @@
 ;; about the language level of this file in a form that our tools can easily process.
 ;; #reader(lib "reader.ss" "plai" "lang")
 
+(include "aula3.scm")
+
 ;LR| durante o desenvolvimento é melhor omitir os resultados "good", porque
 ;LR| quando há muitos testes podemos não ver os "bad" no meio dos "good"
  
@@ -90,11 +92,4 @@
                              (%id 'y)))))
       7)
 
-; exibir contagem de falhas, exceções e testes
-(define (contar-testes simbolo) 
-  (length (filter (lambda (teste) (eq? simbolo (car teste))) 
-                  plai-all-test-results)))
-
-(display (list (contar-testes 'bad) "falhas," 
-               (contar-testes 'exception) "excecoes em"
-               (length plai-all-test-results) "testes"))
+(include "test-summary.scm")

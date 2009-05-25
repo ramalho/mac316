@@ -1,6 +1,3 @@
-;; The first three lines of this file were inserted by DrScheme. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "reader.ss" "plai" "lang")
 ;LR| Neste arquivo o Prof. Gubi colocou vários comentários e perguntas.
 ;LR| Os comentários que indicam páginas no livro PLAI e aqueles marcados 
 ;LR| com ;LR| são meus (Luciano Ramalho)
@@ -106,4 +103,3 @@
 
 ;LR| movi os testes para o arquivo aula3-tests.scm
 
-(include "aula3-tests.scm")
