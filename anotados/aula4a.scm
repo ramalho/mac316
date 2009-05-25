@@ -20,7 +20,7 @@
 ; busca linear
 (define (lookup name ds)
   (type-case DefrdSub ds
-             [mtSub () (error 'lookup "no binding for identifier")]
+             [mtSub () (error 'lookup "no binding for identifier: ~s" name)]
              [aSub (bound-name bound-value rest-ds)
                    (if (symbol=? bound-name name)
                        bound-value		; valor associado
