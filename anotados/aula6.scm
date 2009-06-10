@@ -1,4 +1,6 @@
-
+;; The first three lines of this file were inserted by DrScheme. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "reader.ss" "plai" "lang")
 ; expressão aceita pela linguagem
 (define-type CFAE/L
   [%num  (n number?)]
@@ -85,13 +87,15 @@
 
 (define (num-zero? n) (zero? (numV-n (strict n))))
 
+(define VERBOSE #f)
+
 ;; strict CFAE/L-Value->CFAE/L-Value [sem exprV]
 (define (strict e)
   (type-case CFAE/L-Value e
     [exprV (expr env)
            (local ([define val (strict (interpd expr env))])
              (begin
-               (printf "Forçando exprV com ~a~n" val)
+               (cond (VERBOSE (printf "Forçando exprV com ~a~n" val)))
                val))
            ]
     [else e]

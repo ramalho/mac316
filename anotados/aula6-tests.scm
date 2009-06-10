@@ -1,8 +1,7 @@
 ;; The first three lines of this file were inserted by DrScheme. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "reader.ss" "plai" "lang")
-
-(include "aula6.scm")
+(require "aula6.scm")
 (print-only-errors #t)
 
 ;; Testes do Prof. Gubi:
