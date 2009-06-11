@@ -1,0 +1,11 @@
+EP1: Extensão da linguagem para funçoes com muitas variáveis
+
+Estenda as linguagens que usam funções de primeira classe e substituição postergada, para que as funções possam receber mais de um parâmetro. Devem ser modificados os ítens fun e app da sintaxe abstrata, vem como o interpretador. O parser também deve ser adaptado de acordo.
+
+Se o número de parâmetros na chamada não for o mesmo do número declarado, o programa termina com erro.
+
+Não se preocupe com nomes de parâmetros repetidos, mas se você cuidar deste detalhe, terá direito a um bônus.
+
+
+ 
+
