@@ -5,7 +5,6 @@
   (lambda (x)
     (and (not (pair? x)) (not (null? x)))))
 
-
 (define lat?
   (lambda (l)
     (cond
@@ -171,6 +170,5 @@
 (test (multisubst 'x 'b '(a b b)) '(a x x))
 (test (multisubst 'x 'c '(c b c)) '(x b x))
 (test (multisubst 'x 'z '(a b c)) '(a b c))
-
 
 (include "test-summary.scm")
