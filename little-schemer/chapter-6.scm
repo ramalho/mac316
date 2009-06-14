@@ -15,11 +15,13 @@
     (cond
       ((null? s) #f)
       ((and (atom? (car s)) (not (number? (car s)))) #f)
-      ((or (number? (car s)) (numeric? (car s)))
+      ((or (number? (car s)) (numeric? (cdr s)))
        (cond
-         ((or (eq? (car (cdr s)) '+)
-              (eq? (car (cdr s)) '*)
-              (eq? (car (cdr s)) '^)) (numeric? (cdr (cdr s))))
+         ((and (not (null? (cdr s))) 
+               (or (eq? (car (cdr s)) '+) 
+                   (eq? (car (cdr s)) '*) 
+                   (eq? (car (cdr s)) '^))) 
+               (numeric? (cdr (cdr s))))
          (else #f))))))
 
 ;;; tests
