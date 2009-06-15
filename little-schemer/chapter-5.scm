@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrScheme. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "reader.ss" "plai" "lang")
+#reader(planet plai/plai:1:3/lang/reader)
 ;; The Little Schemer
 ;; Chapter 5. *Oh My Gawd*: It's Full of Stars
 
